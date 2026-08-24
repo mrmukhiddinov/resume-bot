@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rezyume quruvchi</title>
+
+<!-- Shriftlar Google Fonts'dan. Internet bo'lmasa link yuklanmaydi,
+     lekin har bir shrift to'plamida zaxira (fallback) shriftlar bor —
+     sahifa baribir chiroyli ko'rinadi. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&family=Merriweather:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   1) INTERFEYS (chapdagi forma, tepadagi panel) — bu qism
+      PDF'ga chiqmaydi, faqat ekranda ko'rinadi.
+   ============================================================ */
+:root{
+  --ui-bg:#eceef2;         /* umumiy fon */
+  --ui-panel:#ffffff;      /* forma paneli */
+  --ui-edge:#dde1e8;       /* chiziqlar */
+  --ui-ink:#1b1f27;        /* asosiy matn */
+  --ui-mute:#6d7480;       /* ikkinchi darajali matn */
+  --ui-accent:#2f4a7a;     /* interfeys urg'u rangi */
+  --ui-accent-soft:#e8edf6;
+  --ui-r:9px;              /* burchak radiusi */
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ui-bg);color:var(--ui-ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size:14px;-webkit-text-size-adjust:100%;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+
+.app{display:grid;grid-template-columns:392px 1fr;height:100vh;overflow:hidden}
+
+/* --- Chap panel: forma --- */
+.panel{background:var(--ui-panel);border-right:1px solid var(--ui-edge);overflow-y:auto;overflow-x:hidden}
+.panel-head{
+  position:sticky;top:0;z-index:5;background:var(--ui-panel);
+  border-bottom:1px solid var(--ui-edge);padding:14px 18px 12px;
+}
+.brand{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.brand-mark{width:22px;height:22px;border-radius:5px;background:var(--ui-accent);position:relative;flex:none}
+.brand-mark::after{content:"";position:absolute;left:5px;right:5px;top:6px;height:2px;background:#fff;
+  box-shadow:0 4px 0 rgba(255,255,255,.75), 0 8px 0 rgba(255,255,255,.5)}
+.brand-name{font-weight:600;letter-spacing:-.2px}
+.head-row{display:flex;gap:8px}
+.head-row2{display:flex;gap:8px;margin-top:8px}
+.head-row2 .btn{flex:1;font-size:12.5px;padding:7px 10px}
+.tip{display:none;margin-top:9px;background:#fff7e2;border:1px solid #f0dfae;border-radius:var(--ui-r);
+  padding:8px 10px;font-size:11.8px;line-height:1.45;color:#6b5518}
+.tip.on{display:block}
+.head-row select{flex:1;min-width:0}
+.btn{
+  border:1px solid var(--ui-edge);background:#fff;border-radius:var(--ui-r);
+  padding:9px 12px;cursor:pointer;transition:.15s;font-size:13.5px;
+}
+.btn:hover{border-color:#b9c1cf;background:#fafbfd}
+.btn-primary{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;font-weight:500;white-space:nowrap}
+.btn-primary:hover{background:#253c66;border-color:#253c66}
+select,input[type=text],input[type=email],input[type=tel],textarea{
+  width:100%;border:1px solid var(--ui-edge);border-radius:var(--ui-r);
+  padding:9px 11px;background:#fff;outline:none;transition:.15s;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--ui-accent);box-shadow:0 0 0 3px var(--ui-accent-soft)}
+textarea{resize:vertical;min-height:78px;line-height:1.5}
+
+/* --- Yig'iladigan bo'limlar --- */
+details.grp{border-bottom:1px solid var(--ui-edge)}
+details.grp>summary{
+  list-style:none;cursor:pointer;padding:13px 18px;font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;user-select:none;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:#f7f8fb}
+details.grp>summary::after{content:"";width:7px;height:7px;border-right:1.6px solid var(--ui-mute);
+  border-bottom:1.6px solid var(--ui-mute);transform:rotate(45deg);margin-right:3px;transition:.2s}
+details.grp[open]>summary::after{transform:rotate(-135deg)}
+.grp-body{padding:2px 18px 18px}
+.field{margin-bottom:11px}
+.field:last-child{margin-bottom:0}
+.lbl{display:block;font-size:12px;color:var(--ui-mute);margin-bottom:5px;letter-spacing:.2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.hint{font-size:11.5px;color:var(--ui-mute);margin-top:5px;line-height:1.45}
+
+/* --- Shablonlar ro'yxati --- */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tpl{
+  border:1px solid var(--ui-edge);border-radius:var(--ui-r);background:#fff;
+  padding:8px 9px;cursor:pointer;text-align:left;display:flex;gap:8px;align-items:center;transition:.15s;
+}
+.tpl:hover{border-color:#b9c1cf}
+.tpl.on{border-color:var(--ui-accent);background:var(--ui-accent-soft)}
+.tpl-swatch{width:22px;height:29px;border-radius:3px;flex:none;background:#fff;border:1px solid rgba(0,0,0,.12);overflow:hidden;position:relative}
+.tpl-name{font-size:12px;line-height:1.25;font-weight:500}
+.tpl-sub{font-size:10.5px;color:var(--ui-mute);margin-top:1px}
+
+/* --- Ranglar qatori --- */
+.colors{display:flex;flex-wrap:wrap;gap:7px}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;
+  box-shadow:0 0 0 1px var(--ui-edge) inset}
+.sw.on{border-color:var(--ui-ink);box-shadow:none}
+
+/* --- Ro'yxat qatorlari (tajriba, ta'lim...) --- */
+.row{border:1px solid var(--ui-edge);border-radius:var(--ui-r);padding:11px;margin-bottom:9px;background:#fcfcfd}
+.row-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.row-num{font-size:11.5px;color:var(--ui-mute);letter-spacing:.4px}
+.x{border:none;background:none;cursor:pointer;color:var(--ui-mute);font-size:17px;line-height:1;padding:2px 5px;border-radius:5px}
+.x:hover{background:#fde8e8;color:#a52222}
+.add{width:100%;border:1px dashed #c3cad6;background:#fff;border-radius:var(--ui-r);padding:9px;
+  cursor:pointer;color:var(--ui-accent);font-size:13px}
+.add:hover{background:var(--ui-accent-soft)}
+
+/* --- Foto --- */
+.photo-box{display:flex;gap:11px;align-items:center}
+.photo-prev{width:56px;height:56px;border-radius:50%;background:#f0f2f6;border:1px solid var(--ui-edge);
+  object-fit:cover;flex:none}
+.photo-btns{display:flex;flex-direction:column;gap:6px;flex:1}
+.check{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer}
+
+/* --- O'ng tomon: ko'rinish --- */
+.preview{overflow:auto;padding:22px;display:flex;justify-content:center;align-items:flex-start;background:var(--ui-bg)}
+.wrap{position:relative}
+.stage{position:absolute;top:0;left:0;transform-origin:top left}
+.resume{box-shadow:0 3px 22px rgba(20,30,50,.16)}
+
+/* --- Mobil rejim --- */
+.tabs{display:none;position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;
+  border-top:1px solid var(--ui-edge);padding:7px;gap:7px;box-shadow:0 -3px 14px rgba(0,0,0,.06)}
+.tabs button{flex:1;border:none;background:none;padding:10px;border-radius:8px;font-size:13.5px;cursor:pointer}
+.tabs button.on{background:var(--ui-accent-soft);color:var(--ui-accent);font-weight:600}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;height:auto;overflow:visible}
+  .panel{border-right:none;height:auto;overflow:visible;padding-bottom:66px}
+  .preview{display:none;padding:12px 10px 74px}
+  body.show-prev .panel{display:none}
+  body.show-prev .preview{display:flex}
+  .tabs{display:flex}
+  .tpl-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+<link rel="stylesheet" href="/core/style.css">
+<body>
+<div class="app">
+
+  <!-- ================= CHAP TOMON: FORMA ================= -->
+  <aside class="panel" id="panel">
+
+    <div class="panel-head">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-name" data-t="appTitle"></div>
+      </div>
+      <div class="head-row">
+        <select id="lang" aria-label="Til">
+          <option value="uz">O'zbekcha</option>
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+        </select>
+        <button class="btn btn-primary" id="sendBtn" data-t="sendPdf"></button>
+      </div>
+      <div class="tip" id="tip"></div>
+    </div>
+
+    <!-- Shablonlar -->
+    <details class="grp" open>
+      <summary data-t="gTemplates"></summary>
+      <div class="grp-body">
+        <div class="tpl-grid" id="tplGrid"></div>
+      </div>
+    </details>
+
+    <!-- Qo'lda aralashtirish -->
+    <details class="grp">
+      <summary data-t="gCustom"></summary>
+      <div class="grp-body">
+        <div class="field">
+          <span class="lbl" data-t="structure"></span>
+          <select id="selStructure"></select>
+        </div>
+        <div class="field">
+          <span class="lbl" data-t="font"></span>
+          <select id="selFont"></select>
+        </div>
+        <div class="field">
+          <span class="lbl" data-t="color"></span>
+          <div class="colors" id="colorRow"></div>
+        </div>
+        <div class="hint" data-t="customHint"></div>
+      </div>
+    </details>
+
+    <!-- Asosiy -->
+    <details class="grp" open>
+      <summary data-t="gBasics"></summary>
+      <div class="grp-body">
+        <div class="field">
+          <span class="lbl" data-t="fullName"></span>
+          <input type="text" data-f="name">
+        </div>
+        <div class="field">
+          <span class="lbl" data-t="profession"></span>
+          <input type="text" data-f="role">
+        </div>
+        <div class="field">
+          <span class="lbl" data-t="photo"></span>
+          <div class="photo-box">
+            <img class="photo-prev" id="photoPrev" alt="">
+            <div class="photo-btns">
+              <input type="file" id="photoInput" accept="image/*" style="display:none">
+              <button class="btn" id="photoBtn" data-t="photoAdd"></button>
+              <button class="btn" id="photoDel" data-t="photoRemove"></button>
+            </div>
+          </div>
+          <label class="check" style="margin-top:9px">
+            <input type="checkbox" id="showPhoto" checked>
+            <span data-t="showPhoto"></span>
+          </label>
+        </div>
+      </div>
+    </details>
+
+    <!-- Aloqa -->
+    <details class="grp">
+      <summary data-t="gContact"></summary>
+      <div class="grp-body">
+        <div class="two">
+          <div class="field"><span class="lbl" data-t="phone"></span><input type="tel" data-f="phone"></div>
+          <div class="field"><span class="lbl" data-t="email"></span><input type="email" data-f="email"></div>
+        </div>
+        <div class="two">
+          <div class="field"><span class="lbl" data-t="city"></span><input type="text" data-f="city"></div>
+          <div class="field"><span class="lbl" data-t="link"></span><input type="text" data-f="link"></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Tanishtiruv -->
+    <details class="grp">
+      <summary data-t="gSummary"></summary>
+      <div class="grp-body">
+        <textarea data-f="summary" rows="4"></textarea>
+        <div class="hint" data-t="summaryHint"></div>
+      </div>
+    </details>
+
+    <!-- Ish tajribasi -->
+    <details class="grp">
+      <summary data-t="gExperience"></summary>
+      <div class="grp-body">
+        <div id="list-experience"></div>
+        <button class="add" data-add="experience" data-t="addExperience"></button>
+      </div>
+    </details>
+
+    <!-- Ta'lim -->
+    <details class="grp">
+      <summary data-t="gEducation"></summary>
+      <div class="grp-body">
+        <div id="list-education"></div>
+        <button class="add" data-add="education" data-t="addEducation"></button>
+      </div>
+    </details>
+
+    <!-- Ko'nikmalar -->
+    <details class="grp">
+      <summary data-t="gSkills"></summary>
+      <div class="grp-body">
+        <textarea data-f="skills" rows="5"></textarea>
+        <div class="hint" data-t="skillsHint"></div>
+      </div>
+    </details>
+
+    <!-- Tillar -->
+    <details class="grp">
+      <summary data-t="gLanguages"></summary>
+      <div class="grp-body">
+        <div id="list-languages"></div>
+        <button class="add" data-add="languages" data-t="addLanguage"></button>
+      </div>
+    </details>
+
+    <!-- Sertifikatlar -->
+    <details class="grp">
+      <summary data-t="gCertificates"></summary>
+      <div class="grp-body">
+        <div id="list-certificates"></div>
+        <button class="add" data-add="certificates" data-t="addCertificate"></button>
+      </div>
+    </details>
+
+    <div style="padding:16px 18px 26px">
+      <button class="btn" id="clearBtn" style="width:100%" data-t="clearAll"></button>
+    </div>
+  </aside>
+
+  <!-- ================= O'NG TOMON: VARAQ ================= -->
+  <div class="preview" id="preview">
+    <div class="wrap" id="wrap">
+      <div class="stage" id="stage">
+        <div class="resume" id="resume" data-structure="classic" data-color="navy" data-font="serif"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobil uchun ikki tugma -->
+<div class="tabs">
+  <button id="tabForm" class="on" data-t="tabForm"></button>
+  <button id="tabPrev" data-t="tabPreview"></button>
+</div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/core/resume-core.js"></script>
+<script>
+/* ============================================================
+   5) TILLAR — interfeys va bo'lim sarlavhalari.
+      Foydalanuvchi yozgan matn hech qachon tarjima qilinmaydi.
+   ============================================================ */
+/* Shablonlar, ranglar, shriftlar va tarjimalar — hammasi o'zakdan (resume-core.js).
+   Shu tufayli botdagi PDF va shu yerdagi ko'rinish 100% bir xil bo'ladi. */
+const I18N = ResumeCore.I18N, COLORS = ResumeCore.COLORS, STRUCTURES = ResumeCore.STRUCTURES,
+      FONTS = ResumeCore.FONTS, TEMPLATES = ResumeCore.TEMPLATES;
+
+// Mini App'ga xos qo'shimcha matnlar
+I18N.uz.sendPdf = "PDF yuborish";  I18N.uz.sendingPdf = "Yasalyapti…";
+I18N.ru.sendPdf = "Отправить PDF"; I18N.ru.sendingPdf = "Создаётся…";
+I18N.en.sendPdf = "Send PDF";      I18N.en.sendingPdf = "Building…";
+
+/* ============================================================
+   7) HOLAT (state) — hamma ma'lumot shu yerda.
+      localStorage ishlatilmaydi: sahifa yangilansa, boshidan boshlanadi.
+   ============================================================ */
+const state = {
+  lang:"uz",
+  design:{structure:"classic", color:"navy", font:"serif"},
+  tpl:0,
+  data:{
+    name:"Dilshod Rahimov",
+    role:"Marketing menejeri",
+    photo:null, showPhoto:true,
+    phone:"+998 90 123 45 67",
+    email:"dilshod@example.com",
+    city:"Toshkent",
+    link:"linkedin.com/in/dilshod",
+    summary:"Raqamli marketingda 5 yillik tajriba. Kichik jamoalarni boshqarganman, reklama byudjetini samarali taqsimlash va o'sish ko'rsatkichlarini o'lchash bilan ishlayman.",
+    experience:[
+      {role:"Marketing menejeri", org:"Alfa Digital", place:"Toshkent", date:"2022 — hozir",
+       desc:"Oylik reklama byudjeti 12 000 $ boshqarilgan\nMijozlar oqimi bir yilda 40% oshgan\n4 kishilik jamoaga rahbarlik"},
+      {role:"Marketing mutaxassisi", org:"Bekstore", place:"Toshkent", date:"2019 — 2022",
+       desc:"Ijtimoiy tarmoqlar strategiyasi\nOylik hisobotlar va tahlil"}
+    ],
+    education:[
+      {degree:"Marketing, bakalavr", org:"Toshkent davlat iqtisodiyot universiteti", date:"2015 — 2019", note:""}
+    ],
+    skills:"Reklama strategiyasi | 90\nGoogle Analytics | 85\nMeta Ads | 80\nKontent rejalashtirish | 75\nJamoa boshqaruvi | 70\nExcel | 65",
+    languages:[{name:"O'zbek", level:"Ona tili"},{name:"Rus", level:"C1"},{name:"Ingliz", level:"B2"}],
+    certificates:[{name:"Google Ads Search", org:"Google", year:"2023"}]
+  }
+};
+
+/* Qisqa yordamchilar */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const L  = () => I18N[state.lang];
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* Aloqa nishonchalari (ichki SVG — tashqi kutubxona kerak emas) */
+/* ============================================================
+   8) REZYUMENI CHIZISH — mantiq o'zakda, bu yerda faqat ekranga qo'yamiz
+   ============================================================ */
+function renderResume(){
+  const r = $("#resume");
+  r.dataset.structure = state.design.structure;
+  r.dataset.color     = state.design.color;
+  r.dataset.font      = state.design.font;
+  r.innerHTML = ResumeCore.inner(state);
+  fitZoom();
+}
+
+/* Varaqni oynaga sig'dirish (ekran uchun; chop etishda o'chadi) */
+function fitZoom(){
+  const A4 = 210*96/25.4;                       // A4 kengligi px'da
+  const prev=$("#preview"), wrap=$("#wrap"), stage=$("#stage"), res=$("#resume");
+  const avail = prev.clientWidth - 44;
+  const z = Math.min(1, avail/A4);
+  stage.style.transform = `scale(${z})`;
+  wrap.style.width  = (A4*z)+"px";
+  wrap.style.height = (res.offsetHeight*z)+"px";
+}
+window.addEventListener("resize", fitZoom);
+
+/* ============================================================
+   9) FORMANI CHIZISH
+   ============================================================ */
+function inp(list,i,k,label,type){
+  const v = esc(state.data[list][i][k]);
+  if(type==="area") return `<div class="field"><span class="lbl">${esc(label)}</span>
+    <textarea data-list="${list}" data-i="${i}" data-k="${k}" rows="3">${v}</textarea></div>`;
+  return `<div class="field"><span class="lbl">${esc(label)}</span>
+    <input type="text" data-list="${list}" data-i="${i}" data-k="${k}" value="${v}"></div>`;
+}
+
+function renderLists(){
+  const t=L();
+  // Ish tajribasi
+  $("#list-experience").innerHTML = state.data.experience.map((e,i)=>`
+    <div class="row"><div class="row-top"><span class="row-num">${i+1}</span>
+      <button class="x" data-del="experience" data-i="${i}" title="${esc(t.photoRemove)}">×</button></div>
+      ${inp("experience",i,"role",t.position)}
+      ${inp("experience",i,"org",t.company)}
+      <div class="two">${inp("experience",i,"place",t.place)}${inp("experience",i,"date",t.period)}</div>
+      ${inp("experience",i,"desc",t.description,"area")}
+      <div class="hint">${esc(t.descHint)}</div>
+    </div>`).join("");
+
+  // Ta'lim
+  $("#list-education").innerHTML = state.data.education.map((e,i)=>`
+    <div class="row"><div class="row-top"><span class="row-num">${i+1}</span>
+      <button class="x" data-del="education" data-i="${i}">×</button></div>
+      ${inp("education",i,"degree",t.degree)}
+      ${inp("education",i,"org",t.institution)}
+      ${inp("education",i,"date",t.period)}
+      ${inp("education",i,"note",t.note)}
+    </div>`).join("");
+
+  // Tillar
+  $("#list-languages").innerHTML = state.data.languages.map((e,i)=>`
+    <div class="row"><div class="row-top"><span class="row-num">${i+1}</span>
+      <button class="x" data-del="languages" data-i="${i}">×</button></div>
+      <div class="two">${inp("languages",i,"name",t.langName)}${inp("languages",i,"level",t.langLevel)}</div>
+    </div>`).join("");
+
+  // Sertifikatlar
+  $("#list-certificates").innerHTML = state.data.certificates.map((e,i)=>`
+    <div class="row"><div class="row-top"><span class="row-num">${i+1}</span>
+      <button class="x" data-del="certificates" data-i="${i}">×</button></div>
+      ${inp("certificates",i,"name",t.certName)}
+      <div class="two">${inp("certificates",i,"org",t.certOrg)}${inp("certificates",i,"year",t.certYear)}</div>
+    </div>`).join("");
+}
+
+function renderTexts(){
+  const t=L();
+  $$("[data-t]").forEach(el=>{ const k=el.getAttribute("data-t"); if(t[k]!=null) el.textContent=t[k]; });
+  document.documentElement.lang = state.lang;
+  // Struktura va shrift ro'yxatlari
+  $("#selStructure").innerHTML = STRUCTURES.map(s=>`<option value="${s}">${esc(t.struct[s])}</option>`).join("");
+  $("#selFont").innerHTML = FONTS.map(f=>`<option value="${f}">${esc(t.fonts[f])}</option>`).join("");
+  $("#selStructure").value = state.design.structure;
+  $("#selFont").value = state.design.font;
+  $("#colorRow").innerHTML = COLORS.map(([k,hex])=>
+    `<button class="sw${state.design.color===k?" on":""}" data-color="${k}" title="${esc(t.colors[k])}" style="background:${hex}"></button>`).join("");
+}
+
+function renderFields(){
+  const d=state.data;
+  $$("[data-f]").forEach(el=>{ el.value = d[el.getAttribute("data-f")] || ""; });
+  $("#showPhoto").checked = !!d.showPhoto;
+  const p=$("#photoPrev");
+  if(d.photo){ p.src=d.photo; p.style.visibility="visible"; } else { p.removeAttribute("src"); p.style.visibility="hidden"; }
+}
+
+/* Shablon ro'yxati uchun kichik ko'rgazma kvadratchasi */
+function swatchBg(s,c){
+  switch(s){
+    case "leftpanel":  return `linear-gradient(90deg, ${c} 0 36%, #fff 36%)`;
+    case "rightpanel": return `linear-gradient(90deg, #fff 0 64%, ${c} 64%)`;
+    case "banner":     return `linear-gradient(180deg, ${c} 0 34%, #fff 34%)`;
+    case "classic":    return `linear-gradient(180deg, ${c} 0 15%, #fff 15%)`;
+    case "timeline":   return `linear-gradient(90deg, #fff 0 20%, ${c} 20% 27%, #fff 27%)`;
+    case "minimal":    return `linear-gradient(180deg, #fff 0 47%, ${c} 47% 52%, #fff 52%)`;
+    case "academic":   return `repeating-linear-gradient(180deg, ${c} 0 1.5px, #fff 1.5px 6px)`;
+    case "creative":   return `radial-gradient(circle at 100% 0, ${c} 0 46%, #fff 46%)`;
+  }
+  return "#fff";
+}
+
+function renderTemplates(){
+  const t=L();
+  $("#tplGrid").innerHTML = TEMPLATES.map(([name,s,c,f],i)=>{
+    const hex = (COLORS.find(x=>x[0]===c)||[])[1] || "#333";
+    return `<button class="tpl${state.tpl===i?" on":""}" data-tpl="${i}">
+      <span class="tpl-swatch" style="background:${swatchBg(s,hex)}"></span>
+      <span><span class="tpl-name">${esc(name)}</span><span class="tpl-sub">${esc(t.struct[s])}</span></span>
+    </button>`;
+  }).join("");
+}
+
+function renderAll(){ renderTexts(); renderTemplates(); renderLists(); renderFields(); renderResume(); }
+
+/* ============================================================
+   10) HODISALAR
+   ============================================================ */
+const panel = $("#panel");
+
+// Matn kiritish — forma qayta chizilmaydi, faqat varaq yangilanadi
+panel.addEventListener("input", e=>{
+  const el=e.target;
+  if(el.dataset.f){ state.data[el.dataset.f]=el.value; renderResume(); return; }
+  if(el.dataset.list){ state.data[el.dataset.list][+el.dataset.i][el.dataset.k]=el.value; renderResume(); }
+});
+
+// Tugmalar
+panel.addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+
+  if(b.dataset.tpl!==undefined){                       // shablon tanlash
+    const [ ,s,c,f]=TEMPLATES[+b.dataset.tpl];
+    state.tpl=+b.dataset.tpl; state.design={structure:s,color:c,font:f};
+    renderTemplates(); renderTexts(); renderResume(); return;
+  }
+  if(b.dataset.color){                                  // rangni qo'lda almashtirish
+    state.design.color=b.dataset.color; state.tpl=-1;
+    renderTexts(); renderTemplates(); renderResume(); return;
+  }
+  if(b.dataset.add){                                    // yangi qator qo'shish
+    const k=b.dataset.add;
+    const blank={experience:{role:"",org:"",place:"",date:"",desc:""},
+                 education:{degree:"",org:"",date:"",note:""},
+                 languages:{name:"",level:""},
+                 certificates:{name:"",org:"",year:""}}[k];
+    state.data[k].push({...blank}); renderLists(); renderResume(); return;
+  }
+  if(b.dataset.del){                                    // qatorni o'chirish
+    state.data[b.dataset.del].splice(+b.dataset.i,1); renderLists(); renderResume(); return;
+  }
+});
+
+// Struktura va shrift
+$("#selStructure").addEventListener("change", e=>{ state.design.structure=e.target.value; state.tpl=-1; renderTemplates(); renderResume(); });
+$("#selFont").addEventListener("change", e=>{ state.design.font=e.target.value; state.tpl=-1; renderTemplates(); renderResume(); });
+
+// Til
+$("#lang").addEventListener("change", e=>{ state.lang=e.target.value; renderAll(); });
+
+// Foto
+$("#photoBtn").addEventListener("click", ()=> $("#photoInput").click());
+$("#photoInput").addEventListener("change", e=>{
+  const f=e.target.files && e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ state.data.photo=rd.result; renderFields(); renderResume(); };
+  rd.readAsDataURL(f);
+  e.target.value="";
+});
+$("#photoDel").addEventListener("click", ()=>{ state.data.photo=null; renderFields(); renderResume(); });
+$("#showPhoto").addEventListener("change", e=>{ state.data.showPhoto=e.target.checked; renderResume(); });
+
+/* ---------- Telegram bilan bog'lanish ---------- */
+const TG = window.Telegram && window.Telegram.WebApp;
+if (TG) { TG.ready(); TG.expand(); }
+
+/* Botda kiritilgan ma'lumotni tortib olish — ikkala yo'l bitta rezyumeni to'ldiradi */
+async function loadFromServer(){
+  if (!TG || !TG.initData) return;
+  try{
+    const r = await fetch("/api/state", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ initData: TG.initData })});
+    const j = await r.json();
+    if (j && j.ok && j.state){
+      const has = j.state.data && (j.state.data.name || (j.state.data.experience||[]).length);
+      if (has){ Object.assign(state, j.state); renderAll(); }
+    }
+  }catch(e){ /* ma'lumot bo'lmasa — namunaviy rezyume qoladi */ }
+}
+
+/* PDF: server Chrome'da chizadi va botga fayl qilib yuboradi */
+$("#sendBtn").addEventListener("click", async () => {
+  const b = $("#sendBtn"), tip = $("#tip");
+  if (!TG || !TG.initData){
+    tip.textContent = "Bu sahifa Telegram bot ichida ochilishi kerak.";
+    tip.classList.add("on"); return;
+  }
+  const old = b.textContent;
+  b.disabled = true; b.textContent = L().sendingPdf;
+  tip.classList.remove("on");
+  try{
+    const r = await fetch("/api/pdf", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ initData: TG.initData, state })});
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || "xato");
+    if (TG.HapticFeedback) TG.HapticFeedback.notificationOccurred("success");
+    TG.close();
+  }catch(e){
+    tip.textContent = "Xato: " + (e.message || e);
+    tip.classList.add("on");
+  }finally{
+    b.disabled = false; b.textContent = old;
+  }
+});
+
+// Tozalash
+$("#clearBtn").addEventListener("click", ()=>{
+  if(!confirm(L().clearAsk)) return;
+  Object.assign(state.data,{name:"",role:"",photo:null,showPhoto:true,phone:"",email:"",city:"",link:"",
+    summary:"", experience:[{role:"",org:"",place:"",date:"",desc:""}],
+    education:[{degree:"",org:"",date:"",note:""}], skills:"",
+    languages:[{name:"",level:""}], certificates:[{name:"",org:"",year:""}]});
+  renderAll();
+});
+
+// Mobil tugmalar
+$("#tabForm").addEventListener("click", ()=>{ document.body.classList.remove("show-prev");
+  $("#tabForm").classList.add("on"); $("#tabPrev").classList.remove("on"); });
+$("#tabPrev").addEventListener("click", ()=>{ document.body.classList.add("show-prev");
+  $("#tabPrev").classList.add("on"); $("#tabForm").classList.remove("on"); window.scrollTo(0,0); setTimeout(fitZoom,30); });
+
+// Shriftlar yuklangach o'lchamni qayta hisoblash
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitZoom);
+
+renderAll();
+loadFromServer();
+</script>
+</body>
+</html>
