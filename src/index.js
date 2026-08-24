@@ -78,6 +78,11 @@ app.listen(PORT, async () => {
       await bot.api.setWebhook(PUBLIC_URL + HOOK, { drop_pending_updates: true });
       console.log("Webhook o'rnatildi:", PUBLIC_URL + HOOK);
       console.log("Mini App:", PUBLIC_URL + "/app.html");
+      // Xabar yozish joyining yonida doimiy tugma paydo bo'ladi
+      await bot.api.setChatMenuButton({
+        menu_button: { type: "web_app", text: "Rezyume",
+                       web_app: { url: PUBLIC_URL + "/app.html" } }
+      }).catch(e => console.error("Menyu tugmasi:", e.message));
     } catch (e) { console.error("Webhook o'rnatilmadi:", e.message); }
   } else {
     console.log("PUBLIC_URL yo'q — polling rejimida ishlaymiz (kompyuterda sinash uchun)");

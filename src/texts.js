@@ -2,7 +2,7 @@
 const T = {
 uz: {
   chooseLang: "Tilni tanlang / Выберите язык / Choose a language",
-  welcome: "Salom! Men rezyume yasayman va tayyor PDF qilib yuboraman.\n\nIkki yo'l bor:\n• Savollarga javob berasiz — men so'rab boraman\n• Yoki «Tahrirlash» tugmasi bilan qulay oynada to'ldirasiz\n\nBoshladik. Ism-familiyangizni yozing:",
+  welcome: "Salom! Men rezyume yasayman va tayyor PDF qilib yuboraman.\n\nIkki yo'l bor:\n• Savollarga javob berasiz — men so'rab boraman\n• Yoki «Tahrirlash» tugmasi bilan qulay oynada to'ldirasiz\n\nIkkinchi yo'lni tanlasangiz — pastdagi «Tahrirlash» tugmasini bosing.\n\nBirinchi yo'l bilan boshlaymiz. Ism-familiyangizni yozing:",
   askName: "Ism-familiyangizni yozing:",
   askRole: "Kasbingiz yoki lavozimingiz? (masalan: Marketing menejeri)",
   askContact: "Aloqa ma'lumotlari. BITTA xabarda, har biri alohida qatorda:\n\n1) telefon\n2) email\n3) shahar\n4) havola (linkedin, sayt)\n\nBo'lmaganiga chiziqcha ( - ) qo'ying.\n\nMasalan:\n+998 90 123 45 67\nali@mail.com\nToshkent\n-",
@@ -33,7 +33,7 @@ uz: {
 },
 ru: {
   chooseLang: "Tilni tanlang / Выберите язык / Choose a language",
-  welcome: "Привет! Я сделаю резюме и пришлю готовый PDF.\n\nДва способа:\n• Ответить на мои вопросы\n• Или заполнить в удобном окне через кнопку «Редактировать»\n\nНачнём. Напишите имя и фамилию:",
+  welcome: "Привет! Я сделаю резюме и пришлю готовый PDF.\n\nДва способа:\n• Ответить на мои вопросы\n• Или заполнить в удобном окне через кнопку «Редактировать»\n\nВторой способ — нажмите кнопку «Редактировать» ниже.\n\nИначе начнём с вопросов. Напишите имя и фамилию:",
   askName: "Напишите имя и фамилию:",
   askRole: "Ваша профессия или должность? (например: Менеджер по маркетингу)",
   askContact: "Контакты. ОДНИМ сообщением, каждый с новой строки:\n\n1) телефон\n2) email\n3) город\n4) ссылка\n\nЕсли чего-то нет — поставьте дефис ( - ).",
@@ -64,7 +64,7 @@ ru: {
 },
 en: {
   chooseLang: "Tilni tanlang / Выберите язык / Choose a language",
-  welcome: "Hi! I build resumes and send you a ready PDF.\n\nTwo ways:\n• Answer my questions\n• Or fill everything in a comfortable window via «Edit»\n\nLet's start. Type your full name:",
+  welcome: "Hi! I build resumes and send you a ready PDF.\n\nTwo ways:\n• Answer my questions\n• Or fill everything in a comfortable window via «Edit»\n\nFor the second way — press «Edit» below.\n\nOtherwise let's start. Type your full name:",
   askName: "Type your full name:",
   askRole: "Your profession or job title? (e.g. Marketing Manager)",
   askContact: "Contact details. In ONE message, each on its own line:\n\n1) phone\n2) email\n3) city\n4) link\n\nUse a dash ( - ) for anything you don't have.",

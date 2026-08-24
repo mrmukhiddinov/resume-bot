@@ -12,6 +12,12 @@ const APP_URL = () => (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL
 const lines = (s) => String(s || "").split("\n").map(x => x.trim()).filter(Boolean);
 const isSkip = (s) => /^(\/skip|-|yo'q|нет|no|skip)$/i.test(String(s || "").trim());
 
+// Faqat "qulay oynada to'ldirish" tugmasi
+function appKb(t) {
+  const u = APP_URL();
+  return u ? new InlineKeyboard().webApp(t.btnApp, u + "/app.html") : undefined;
+}
+
 function mainKb(t) {
   const kb = new InlineKeyboard().text(t.btnTpl, "tpl:0").text(t.btnPdf, "pdf");
   const u = APP_URL();
@@ -56,7 +62,8 @@ bot.callbackQuery(/^lang:(uz|ru|en)$/, async (ctx) => {
   s.step = "name";
   S.set(ctx.from.id, s);
   await ctx.answerCallbackQuery();
-  await ctx.reply(txt(s.lang).welcome);
+  const t = txt(s.lang);
+  await ctx.reply(t.welcome, { reply_markup: appKb(t) });
 });
 
 /* ---------- "o'tkazib yuborish" va "yana qo'shish" tugmalari ---------- */
